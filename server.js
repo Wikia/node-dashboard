@@ -3,7 +3,7 @@ var util = require('util');
 var express = require('express');
 var dashboards = require("./lib/dashboards")
 
-var app = express.createServer();
+var app = express();
 
 var rootPath = process.cwd();
 var staticPath = path.join(rootPath, 'public');
@@ -13,7 +13,7 @@ app.configure(function () {
   app.use(express.static(staticPath));
   app.use(express.favicon(path.join(staticPath, 'favicon.ico')));
   app.use(express.logger());
-  //app.use(express.bodyParser());
+  app.use(express.bodyParser()); // json, urlencoded, multipart
   //app.use(express.methodOverride());
 });
 var port = process.env.PORT || 8080;
