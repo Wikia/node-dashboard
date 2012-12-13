@@ -5,7 +5,7 @@ Widget
 
 
 Source
-  data: {name: SERIES_DATA}
+  series: {name: SERIES_DATA}
   earliest, latest: ...
   keepHistoryFor: ...
 
@@ -14,10 +14,8 @@ Source
   getSeries([names],[from],[to]) -> { name: SERIES_DATA, ... }
   getLast([names]) -> { name: SINGLE_VALUE, ... }
   getMaxHistoryTime()
-
   addData(data) [ data -> { name: SERIES_DATA, ... } ]
-  addWidget( widget )
-  removeWidget( widget )
+	
 
 
 Provider:
