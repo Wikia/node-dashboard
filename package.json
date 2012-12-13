@@ -1,9 +1,9 @@
 {
   "name": "node-dashboard",
   "version": "0.1.0",
-  "description": "Wikia internal dashboard",
+  "description": "Wikia internal devios dashboard",
   "author": "Szumo <szumo@wikia-inc.com>, ",
-  "homepage": "http://github.com/szumo/node-dashboard",
+  "homepage": "http://github.com/Wikia/node-dashboard",
   "keywords": [
     "node"
   ],
@@ -15,12 +15,9 @@
   "licenses": [{
     "type": "GPL3"
   }],
-  "bugs": {
-    "url": "https://github.com/szumo/node-dashboard/issues"
-  },
   "repository": {
     "type": "git",
-    "url": "http://github.com/szumo/node-dashboard.git"
+    "url": "http://github.com/Wikia/node-dashboard.git"
   },
   "main": "server.js",
   "engines": {
