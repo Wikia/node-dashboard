@@ -30,5 +30,13 @@ app.get('/status', function(req, res) {
 var dataServer = new DataServer(settings,io);
 dataServer.run();
 
-util.log('Server started on port ' + port);
+app.get('/providers', function(req, res) { // for testing
+  res.send(Object.keys(dataServer.providers).join('\n'), 200);
+});
 
+app.get('/sources', function(req, res) { // for testing
+  res.send()
+  res.send(Object.keys(dataServer.sources).join('\n'), 200);
+});
+
+util.log('Server started on port ' + port);
