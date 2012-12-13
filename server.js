@@ -1,9 +1,11 @@
-var path = require('path');
-var util = require('util');
-var express = require('express');
-var dashboards = require("./lib/dashboards")
+var path = require('path')
+	, util = require('util')
+	, express = require('express')
+	, http = require('http');
 
 var app = express();
+var server = http.createServer(app);
+var io = require('socket.io').listen(server);
 
 var rootPath = process.cwd();
 var staticPath = path.join(rootPath, 'public');
@@ -17,13 +19,28 @@ app.configure(function () {
   //app.use(express.methodOverride());
 });
 var port = process.env.PORT || 8080;
-app.listen(port)
+server.listen(port)
 
 app.get('/status', function(req, res) {
   res.send('OK '+new Date().toString(), 200);
 });
 
-app.get('/', dashboards.list)
+var services = {
+	'list-dashboard': function( socket, data ) {
+		socket.emit('news',{hello:'world'});
+	}
+};
+
+io.sockets.on('connection', function (socket) {
+	for (var i in services) {
+		socket.on(i,(function(fn){
+			return function(data){
+				fn.call(this,socket,data);
+			}
+		})(services[i]));
+	}
+});
+
 
 util.log('Server started on port ' + port);
 
