@@ -1,7 +1,7 @@
 {
   "name": "node-dashboard",
   "version": "0.1.0",
-  "description": "Wikia internal devios dashboard",
+  "description": "Wikia internal devs dashboard",
   "author": "Szumo <szumo@wikia-inc.com>, ",
   "homepage": "http://github.com/Wikia/node-dashboard",
   "keywords": [
