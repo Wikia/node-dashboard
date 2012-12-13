@@ -1,9 +1,14 @@
 sources = require("./../lib/sources")
 
 exports.test_provider = function(beforeExit, assert) {
-    provider = source.constantProvider( { A: 1, B: 2, C:3 })
-    src = sources.singleSource(provider);
+    provider = sources.constantProvider( { A: 5, B: 6, C:7 } )
+    data = provider.getData();
+    assert.equal(data.A.length, 1);
+    assert.equal(data.A[0][1], 5);
+    src = sources.singleSource();
     assert.isDefined(src);
-    assert.equal(src.providerNames, [provider.name]);
-    
+    provider.addSubscriber(src, ['A', 'B', 'C']);
+    provider.start();
+    last = src.getLast();
+    assert.eql(last, {A: 5, B:6, C:7})
 }

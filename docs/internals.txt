@@ -1,11 +1,11 @@
 Layout
-  
+
 
 Widget
-  
+
 
 Source
-  data: SERIES_DATA
+  data: {name: SERIES_DATA}
   earliest, latest: ...
   keepHistoryFor: ...
 
@@ -21,18 +21,17 @@ Source
 
 
 Provider:
-  subscribers: { dataName: [ sourcesToUpdate ], ... }
+  subscribers: [ [source, names], ... ]
 
   constructor(settings)
 
-  addSubscriber( dataName, source )
+  addSubscriber( source, names )
   removeSubscriber( source )
 
   start()
-  
+
 
 SERIES_DATA:
   [ [x, y], [x,y] ]
   int x - timestamp
   double y - value
-
