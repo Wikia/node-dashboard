@@ -5,7 +5,7 @@ exports.test_provider = function(beforeExit, assert) {
     data = provider.getData();
     assert.equal(data.A.length, 1);
     assert.equal(data.A[0][1], 5);
-    src = sources.singleSource();
+    src = sources.Source();
     assert.isDefined(src);
     provider.addSubscriber(src, ['A', 'B', 'C']);
     provider.start();
