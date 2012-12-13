@@ -1,0 +1,38 @@
+Layout
+  
+
+Widget
+  
+
+Source
+  data: SERIES_DATA
+  earliest, latest: ...
+  keepHistoryFor: ...
+
+  constructor(settings)
+  getNames() -> [<names>]
+  getSeries([names],[from],[to]) -> { name: SERIES_DATA, ... }
+  getLast([names]) -> { name: SINGLE_VALUE, ... }
+  getMaxHistoryTime()
+
+  addData(data) [ data -> { name: SERIES_DATA, ... } ]
+  addWidget( widget )
+  removeWidget( widget )
+
+
+Provider:
+  subscribers: { dataName: [ sourcesToUpdate ], ... }
+
+  constructor(settings)
+
+  addSubscriber( dataName, source )
+  removeSubscriber( source )
+
+  start()
+  
+
+SERIES_DATA:
+  [ [x, y], [x,y] ]
+  int x - timestamp
+  double y - value
+
