@@ -1,7 +1,9 @@
 var path = require('path')
 	, util = require('util')
 	, express = require('express')
-	, http = require('http');
+	, http = require('http')
+	, DataServer = require('./lib/dataserver')
+	, settings = require('./settings' );
 
 var app = express();
 var server = http.createServer(app);
@@ -25,22 +27,8 @@ app.get('/status', function(req, res) {
   res.send('OK '+new Date().toString(), 200);
 });
 
-var services = {
-	'list-dashboard': function( socket, data ) {
-		socket.emit('news',{hello:'world'});
-	}
-};
-
-io.sockets.on('connection', function (socket) {
-	for (var i in services) {
-		socket.on(i,(function(fn){
-			return function(data){
-				fn.call(this,socket,data);
-			}
-		})(services[i]));
-	}
-});
-
+var dataServer = new DataServer(settings,io);
+dataServer.run();
 
 util.log('Server started on port ' + port);
 
