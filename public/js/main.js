@@ -4,9 +4,7 @@ var Dashboard = function ( el ) {
 	this.switcher = new LayoutSwitcher(this);
 
 	var self = this;
-	$('window').on('resize',function(){
-		self.switcher.repaint();
-	});
+	$(window).resize($.proxy(this.onWindowResize,this));
 };
 Dashboard.prototype.log = function( msg ) {
 	if ( window.console && typeof window.console.log == 'function' ) {
@@ -50,6 +48,14 @@ Dashboard.prototype.onConnect = function() {
 	for (i in this.sources) {
 		this.sources[i].reset();
 	}
+};
+Dashboard.prototype.onWindowResize = function() {
+	var self = this;
+	clearTimeout(this.resizeTimeout);
+	this.resizeTimeout = setTimeout(function(){
+		self.resizeTimeout = false;
+		self.switcher.repaint();
+	},100);
 };
 Dashboard.prototype.getSource = function( name ) {
 	return this.sources[name]
