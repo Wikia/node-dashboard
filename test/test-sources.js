@@ -21,10 +21,11 @@ exports.new_relic = function(beforeExit, assert) {
 		type: 'NewRelic',
 		apiKey: process.env.NEWRELIC_API_KEY,
 		accountId: process.env.NEWRELIC_ACCOUNT,
-		applications: undefined
+		applications: process.env.NEWRELIC_APPLICATIONS.split(",")
 	}
-  nr = new providers.NewRelic(settings)
-  nr.fetchApplications(util.log)
+  nr = new providers.NewRelic(settings);
+  assert.isDefined(nr.api);
+  nr.fetchMetrics(settings.applications[0], function(result) { util.log(util.inspect(result)); })
 
 
 
