@@ -23,10 +23,11 @@ Dashboard.prototype.run = function() {
 Dashboard.prototype.onUpdateData = function( data ) {
 	var updateQueue = [], source,
 		last, i, widget;
+	this.log('Got data',data);
 	for ( i in data ) {
 		if ( !this.sources[i] ) continue;
 		source = this.sources[i];
-		source.setData(data)
+		source.setData(data[i])
 		updateQueue = updateQueue.concat(source.getWidgets());
 	}
 	updateQueue.sort();
@@ -323,7 +324,7 @@ ChartWidget.prototype.update = function( data ) {
 ChartWidget.prototype.render = function() {
 	if ( !this.el ) return;
 	if ( !this.data ) return;
-	var series = this.data.series,
+	var series = Object.getFirstItem(this.data,2),
 		settings = this.settings,
 		options = {
 			xaxis: {},
@@ -337,6 +338,7 @@ ChartWidget.prototype.render = function() {
 	setIf( options.yaxis, 'title',    settings.ytitle );
 	setIf( options.yaxis, 'min',      settings.min );
 	setIf( options.yaxis, 'max',      settings.max );
+	console.log('Flotr.draw',this.el[0],[series],options);
 	Flotr.draw(this.el[0],[series],options);
 };
 
@@ -344,7 +346,15 @@ function setIf( o, property, value ) {
 	if ( value !== undefined ) {
 		o[property] = value;
 	}
-}
+};
+
+Object.getFirstItem = function( o, cnt ) {
+	cnt = cnt || 1;
+	while (cnt--) {
+		o = o[Object.keys(o)[0]];
+	}
+	return o;
+};
 
 var dashboard = new Dashboard($('#dashboard'));
 dashboard.run();
