@@ -441,7 +441,7 @@ util.inherits(NumberWidget,BaseWidget);
 NumberWidget.prototype.render = function() {
 	if ( !this.el ) return;
 	if ( !this.data ) return;
-	var series = {}
+	var series = {}, data, value;
 	for (src in this.data) {
 		data = this.data[src];
 		for (key in data) {
@@ -449,6 +449,7 @@ NumberWidget.prototype.render = function() {
 			series[key] = value;
 		}
 	}
+	console.log(this.data,series);
 	var table = $('<table class="numberTable"/>');
 	if (this.settings.horizontal) {
 		var tr = $('<tr/>');
