@@ -339,28 +339,36 @@ RemoteSource.prototype.getWidgets = function() {
 	return this.widgets;
 };
 
-var ChartWidget = function(settings,el) {
+var BaseWidget = function(settings,el) {
 	this.el = el;
-	this.sources = settings.sources;
 	this.settings = settings;
+	this.sources = settings.sources;
 	this.data = undefined;
 };
-ChartWidget.prototype.setEl = function( el ) {
+BaseWidget.prototype.setEl = function( el ) {
 	this.el = el;
 	this.update(this.data);
 };
-ChartWidget.prototype.getEl = function() {
+BaseWidget.prototype.getEl = function() {
 	return this.el;
 };
-ChartWidget.prototype.getSources = function() {
+BaseWidget.prototype.getSources = function() {
 	return this.sources;
 };
-ChartWidget.prototype.update = function( data ) {
+BaseWidget.prototype.update = function( data ) {
 	this.data = data;
 	if ( this.el ) {
 		this.render();
 	}
 };
+BaseWidget.prototype.render = function() {
+	console.log('BaseWidget.render() is not implemented!');
+};
+
+var ChartWidget = function(settings) {
+	BaseWidget.apply(this,arguments);
+};
+util.inherits(ChartWidget,BaseWidget);
 ChartWidget.prototype.render = function() {
 	if ( !this.el ) return;
 	if ( !this.data ) return;
