@@ -19,6 +19,7 @@ Dashboard.prototype.run = function() {
 	socket.on('update-sources', $.proxy(this.onUpdateData,this));
 	socket.on('update-flags', $.proxy(this.onUpdateFlags,this));
 	socket.on('update-configuration', $.proxy(this.onConfigure,this));
+	socket.on('connect', $.proxy(this.onConnect,this));
 };
 Dashboard.prototype.onUpdateData = function( data ) {
 	var updateQueue = [], source,
@@ -43,6 +44,12 @@ Dashboard.prototype.onUpdateFlags = function( data ) {
 Dashboard.prototype.onConfigure = function( data ) {
 	this.log('Got configuration',data);
 	this.switcher.setSettings(data);
+};
+Dashboard.prototype.onConnect = function() {
+	var i;
+	for (i in this.sources) {
+		this.sources[i].reset();
+	}
 };
 Dashboard.prototype.getSource = function( name ) {
 	return this.sources[name]
@@ -287,6 +294,12 @@ RemoteSource.prototype.unsubscribe = function() {
 		source: this.name
 	});
 };
+RemoteSource.prototype.reset = function() {
+	this.subscribed = false;
+	if ( this.widgets.length > 0 ) {
+		this.subscribe();
+	}
+};
 RemoteSource.prototype.addWidget = function( widget ) {
 	if ( this.widgets.indexOf(widget) == -1 ) {
 		this.widgets.push(widget);
@@ -331,12 +344,18 @@ ChartWidget.prototype.update = function( data ) {
 ChartWidget.prototype.render = function() {
 	if ( !this.el ) return;
 	if ( !this.data ) return;
-	var series = Object.getFirstItem(this.data,2),
+	var series = [], i, j,
 		settings = this.settings,
 		options = {
 			xaxis: {},
 			yaxis: {}
 		};
+	for (i in this.data) {
+		for (j in this.data[i]) {
+			series.push(this.data[i][j]);
+		}
+	}
+//	console.log({series:series});
 	// set default options
 	setIf( options.xaxis, 'timeMode', 'local' );
 	// set customizable options
@@ -345,8 +364,8 @@ ChartWidget.prototype.render = function() {
 	setIf( options.yaxis, 'title',    settings.ytitle );
 	setIf( options.yaxis, 'min',      settings.min );
 	setIf( options.yaxis, 'max',      settings.max );
-	console.log('Flotr.draw',this.el[0],[series],options);
-	Flotr.draw(this.el[0],[series],options);
+//	console.log('Flotr.draw',this.el[0],series,options);
+	Flotr.draw(this.el[0],series,options);
 };
 
 function setIf( o, property, value ) {
