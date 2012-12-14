@@ -346,18 +346,34 @@ ChartWidget.prototype.update = function( data ) {
 	if ( this.el ) {
 		this.render();
 	}
-}
+};
 ChartWidget.prototype.render = function() {
 	if ( !this.el ) return;
 	if ( !this.data ) return;
 	var series = [], i, j,
 		settings = this.settings,
 		options = {
-			xaxis: {},
+			lines: {},
+			xaxis: {
+				tickFormatter: function(x) {
+					var	dt = new Date(parseInt(x)),
+						h = dt.getHours(),
+						m = dt.getMinutes();
+					return (h<10?'0':'') + h + ':' + (m<10?'0':'') + m;
+				}
+			},
 			yaxis: {}
-		};
+		},
+		showSeries = settings.series || [],
+		skipSeries = settings.seriesSkip || [];
 	for (i in this.data) {
 		for (j in this.data[i]) {
+			if ( showSeries.length != 0 && showSeries.indexOf(j) == -1 ) {
+				continue;
+			}
+			if ( skipSeries.indexOf( j ) != -1 ) {
+				continue;
+			}
 			series.push(this.data[i][j]);
 		}
 	}
@@ -370,6 +386,7 @@ ChartWidget.prototype.render = function() {
 	setIf( options.yaxis, 'title',    settings.ytitle );
 	setIf( options.yaxis, 'min',      settings.min );
 	setIf( options.yaxis, 'max',      settings.max );
+	setIf( options.lines, 'stacked',  settings.stacked );
 //	console.log('Flotr.draw',this.el[0],series,options);
 	Flotr.draw(this.el[0],series,options);
 };
