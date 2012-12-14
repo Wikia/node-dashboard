@@ -4,3 +4,30 @@ body, html,
 	width: 100%;
 	height: 100%;
 }
+
+table.numberTable {
+	margin: 3px;
+	border-width: 1px;
+	border-spacing: 2px;
+	border-style: solid;
+	border-color: green;
+	border-collapse: separate;
+	background-color: white;
+	-moz-border-radius: 3px;
+}
+
+table.numberTable th {
+	border-width: 0px;
+	padding: 2px;
+	border-style: none;
+	border-color: gray;
+	background-color: rgb(255, 245, 238);
+}
+
+table.numberTable td {
+	border-width: 0px;
+	padding: 2px;
+	border-style: none;
+	border-color: gray;
+	background-color: rgb(255, 245, 238);
+}

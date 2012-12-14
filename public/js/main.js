@@ -261,6 +261,12 @@ Layout.prototype.getWidgetClass = function( name ) {
 	switch (name) {
 		case 'chart':
 			return ChartWidget;
+		case 'number':
+			return NumberWidget;
+		case 'switch':
+			return SwitchWidget;
+		case 'alert':
+			return AlertWidget;
 		default:
 			return false;
 	}
@@ -426,6 +432,59 @@ Object.getFirstItem = function( o, cnt ) {
 	}
 	return o;
 };
+
+var NumberWidget = function(settings) {
+	BaseWidget.apply(this,arguments);
+};
+util.inherits(NumberWidget,BaseWidget);
+
+NumberWidget.prototype.render = function() {
+	if ( !this.el ) return;
+	if ( !this.data ) return;
+	var series = {}
+	for (src in this.data) {
+		data = this.data[src];
+		for (key in data) {
+			value = data[key][data[key].length-1];
+			series[key] = value;
+		}
+	}
+	var table = $('<table class="numberTable"/>');
+	if (this.settings.horizontal) {
+		var tr = $('<tr/>');
+		for (key in series) {
+			tr.append($('<td/>').text(key));
+		}
+		table.append(tr);
+		var tr = $('<tr/>');
+		for (key in series) {
+			tr.append($('<td/>').text(series[key][1]));
+		}
+		table.append(tr);
+	}
+	else {
+		for (key in series) {
+			var tr = $('<tr/>');
+			tr.append($('<td/>').text(key));
+			tr.append($('<td/>').text(series[key][1]));
+			table.append(tr);
+		}
+	}
+	this.el.html('');
+	this.el.append(table);
+};
+
+
+var SwitchWidget = function(settings) {
+	BaseWidget.apply(this,arguments);
+};
+util.inherits(SwitchWidget,BaseWidget);
+
+var AlertWidget = function(settings) {
+	BaseWidget.apply(this,arguments);
+};
+util.inherits(AlertWidget,BaseWidget);
+
 
 var dashboard = new Dashboard($('#dashboard'));
 dashboard.run();
