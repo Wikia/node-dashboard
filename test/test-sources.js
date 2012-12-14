@@ -25,11 +25,13 @@ exports.new_relic = function(beforeExit, assert) {
 	}
   nr = new providers.NewRelic(settings);
   assert.isDefined(nr.api);
-  nr.fetchMetrics(settings.applications[0], function(result) { util.log(util.inspect(result)); })
+  src = new sources.Source();
+  nr.addSubscriber(src);
+  //nr.fetchMetrics(settings.applications[0], function(r) { util.log(util.inspect(r));});
 
-
-
-
-
-
+  nr.fetch();
+  beforeExit(function() {
+    util.log(util.inspect(src.getLast()));
+  });
+  
 };
