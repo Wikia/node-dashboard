@@ -5,6 +5,10 @@ body, html,
 	height: 100%;
 }
 
+#dashboard {
+	background-color: #e7e2d6;
+}
+
 table.numberTable {
 	margin: 3px;
 	border-width: 1px;
