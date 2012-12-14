@@ -480,6 +480,29 @@ var SwitchWidget = function(settings) {
 	BaseWidget.apply(this,arguments);
 };
 util.inherits(SwitchWidget,BaseWidget);
+SwitchWidget.prototype.render = function() {
+	if ( !this.el ) return;
+	if ( !this.data ) return;
+	var series = {}, data, value;
+	for (src in this.data) {
+		data = this.data[src];
+		for (key in data) {
+			value = data[key][data[key].length-1];
+			series[key] = value;
+		}
+	}
+	this.el.addClass('bulb-container');
+	var el;
+	this.el.html('');
+	for (key in series) {
+		el = $('<div class="bulb"/>');
+		if ( !series[key][1] ) {
+			el.addClass('state-error');
+		}
+		this.el.append(el);
+	}
+	this.el.append(cnt);
+};
 
 var AlertWidget = function(settings) {
 	BaseWidget.apply(this,arguments);

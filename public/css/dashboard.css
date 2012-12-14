@@ -35,3 +35,23 @@ table.numberTable td {
 	border-color: gray;
 	background-color: rgb(255, 245, 238);
 }
+
+.bulb-container {
+	text-align: center;
+	vertical-align: middle;
+	display: table-cell;
+}
+.bulb {
+	display: inline-block;
+	margin: 5px;
+	border: 1px solid #232323;
+	border-radius: 20px;;
+	-moz-border-radius: 20px;
+	width: 0;
+	height: 0;
+	padding: 20px;
+	background-color: #0fe243;
+}
+.bulb.state-error {
+	background-color: #e34b43;
+}
