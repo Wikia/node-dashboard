@@ -53,6 +53,7 @@ Dashboard.prototype.registerWidget = function( widget ) {
 	for (var i=0;i<sources.length;i++) {
 		this.getSource(sources[i]).addWidget(widget);
 	}
+	this.updateWidget(widget);
 };
 Dashboard.prototype.unregisterWidget = function( widget ) {
 	var sources = widget.getSources();
@@ -62,12 +63,18 @@ Dashboard.prototype.unregisterWidget = function( widget ) {
 };
 Dashboard.prototype.updateWidget = function( widget ) {
 	var sources = widget.getSources(),
-		i, data = {}, sourceName, source;
+		i, data = {}, sourceName, source,
+		sourceData;
 	for (i=0;i<sources.length;i++) {
 		sourceName = sources[i];
 		source = this.sources[sourceName];
 		if ( !source ) continue;
-		data[sourceName] = source.getData();
+		sourceData = source.getData();
+		if ( !sourceData ) {
+			// don't update the widget if some data is missing
+			return;
+		}
+		data[sourceName] = sourceData;
 	}
 	widget.update(data);
 };
