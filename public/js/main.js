@@ -119,6 +119,9 @@ var LayoutSwitcher = function( client ) {
 	setInterval($.proxy(this.work,this),1000);
 };
 LayoutSwitcher.prototype.setSettings = function( settings ) {
+	clearTimeout(this.updateTimeout);
+	this.currentDashboard = false;
+	this.updated = false;
 	this.settings = settings;
 	this.flags = settings.flags;
 	this.work();
@@ -138,6 +141,12 @@ LayoutSwitcher.prototype.work = function() {
 		this.currentDashboard = this.settings.dashboards.xxy;
 		this.currentLayout = -1;
 	}
+	if ( !this.updated ) {
+		this.current && this.current.disable();
+		this.next && this.next.disable();
+		this.current = false;
+		this.next = false;
+	}
 	if ( !this.updated || this.updated < now - this.LAYOUT_CYCLE_LENGTH ) {
 		this.updated = now;
 		this.next && this.next.disable();
@@ -147,7 +156,7 @@ LayoutSwitcher.prototype.work = function() {
 		this.client.log('Preparing layout',layoutName);
 		this.next.enable();
 		if ( this.current ) {
-			setTimeout(function(){
+			this.updateTimeout = setTimeout(function(){
 				self.current.disable();
 				self.current = self.next;
 				self.next = undefined;
@@ -221,7 +230,7 @@ Layout.prototype.show = function() {
 	if ( this.visible ) return;
 	this.enable();
 
-	this.parentEl = $('<div/>')
+	this.parentEl = $('<div class="dashboard-layout"/>')
 		.appendTo(this.client.el)
 		.css({
 			position: 'relative',
@@ -230,18 +239,26 @@ Layout.prototype.show = function() {
 		});
 
 	var widgets = this.widgets,
-		i, el, settings;
+		i, el, widget, settings;
 	for ( i in widgets ) {
-		settings = widgets[i];
+		widget = widgets[i];
+		settings = widget.settings;
 		el = $('<div/>')
 			.appendTo(this.parentEl)
 			.css({
 				width: this.getWidgetWidth(settings.width),
 				height: this.getWidgetHeight(settings.height)
 			});
+		if ( settings.top !== undefined || settings.left !== undefined ) {
+			el.css({
+				position: 'absolute',
+				top: this.parseSize(settings.top || 0,this.client.el.height()),
+				left: this.parseSize(settings.left || 0,this.client.el.width())
+			})
+		}
 		this.parentEl.append(el);
 
-		widgets[i].setEl(el);
+		widget.setEl(el);
 	}
 	this.visible = true;
 };
@@ -271,19 +288,27 @@ Layout.prototype.getWidgetClass = function( name ) {
 			return false;
 	}
 };
-Layout.prototype.getWidgetSize = function( value, max ) {
+Layout.prototype.parseSize = function( value, max ) {
 	if ( typeof value == 'number' ) {
 		return value;
 	}
 	var rv;
-	if ( typeof value == 'string' && ( rv = /^([0-9.]+)%$/.exec(value) ) ) {
-		return Math.floor(parseFloat(rv[1]) * max / 100);
+	if ( typeof value == 'string' ) {
+		if ( rv = /^([0-9.]+)%$/.exec(value) ) {
+			value = Math.floor(parseFloat(rv[1]) * max / 100);
+		} else if ( rv = /^([0-9.]+)\/([0-9.]+)$/.exec(value) ) {
+			value = Math.floor(parseFloat(rv[1])/parseFloat(rv[2])) * max;
+		}
 	}
-	value = parseFloat(value);
-	if ( !value ) value = 0;
-	if ( value < max / 5 ) value = Math.floor(max / 5);
+	value = Math.floor(parseFloat(value));
+	if ( !value || value < 0 ) value = 0;
 	else if ( value > max ) value = max;
-	return Math.floor(value);
+	return value;
+};
+Layout.prototype.getWidgetSize = function( value, max ) {
+	value = this.parseSize(value,max);
+	if ( value < max / 5 ) value = Math.floor(max / 5);
+	return value;
 };
 Layout.prototype.getWidgetWidth = function( value ) {
 	return this.getWidgetSize(value,this.client.el.width());
@@ -416,7 +441,10 @@ ChartWidget.prototype.render = function() {
 	setIf( options.yaxis, 'max',      settings.max );
 	setIf( options.lines, 'stacked',  settings.stacked );
 //	console.log('Flotr.draw',this.el[0],series,options);
+	var cp = this.el.css('position');
 	Flotr.draw(this.el[0],series,options);
+	if (cp == 'absolute')
+		this.el.css('position',cp);
 };
 
 function setIf( o, property, value ) {
@@ -492,16 +520,16 @@ SwitchWidget.prototype.render = function() {
 		}
 	}
 	this.el.addClass('bulb-container');
-	var el;
+	var el, cnt = $('<div/>');
 	this.el.html('');
 	for (key in series) {
 		el = $('<div class="bulb"/>');
 		if ( !series[key][1] ) {
 			el.addClass('state-error');
 		}
-		this.el.append(el);
+		cnt.append(el);
 	}
-	this.el.append(cnt);
+	this.el.append(cnt.children());
 };
 
 var AlertWidget = function(settings) {
