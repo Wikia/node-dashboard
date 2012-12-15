@@ -3,7 +3,8 @@ var path = require('path')
 	, express = require('express')
 	, http = require('http')
 	, DataServer = require('./lib/dataserver')
-	, settings = require('./settings' );
+	, config_parser = require('./lib/config_parser')
+	, settings = config_parser.expand(require('./settings' ));
 
 var app = express();
 var server = http.createServer(app);
