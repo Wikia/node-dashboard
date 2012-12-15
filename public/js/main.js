@@ -392,6 +392,36 @@ BaseWidget.prototype.update = function( data ) {
 		this.render();
 	}
 };
+BaseWidget.prototype.getData = function() {
+	var settings = this.settings,
+		showSeries = settings.series || [],
+		skipSeries = settings.seriesSkip || [],
+		series = {};
+	for (i in this.data) {
+		for (j in this.data[i]) {
+			if ( showSeries.length != 0 && showSeries.indexOf(j) == -1 ) {
+				continue;
+			}
+			if ( skipSeries.indexOf( j ) != -1 ) {
+				continue;
+			}
+			series[j] = this.data[i][j];
+		}
+	}
+	return series;
+};
+BaseWidget.prototype.getLastData = function() {
+	var series = this.getData(), value, last = {},
+		seriesName;
+	for (seriesName in series) {
+		if ( series[seriesName].length > 0 ) {
+			last[seriesName] = series[seriesName][series[seriesName].length-1];
+		} else {
+			last[seriesName] = false;
+		}
+	}
+	return last;
+};
 BaseWidget.prototype.render = function() {
 	console.log('BaseWidget.render() is not implemented!');
 };
@@ -403,7 +433,7 @@ util.inherits(ChartWidget,BaseWidget);
 ChartWidget.prototype.render = function() {
 	if ( !this.el ) return;
 	if ( !this.data ) return;
-	var series = [], i, j,
+	var series = Object.values(this.getData()),
 		settings = this.settings,
 		options = {
 			lines: {},
@@ -416,21 +446,7 @@ ChartWidget.prototype.render = function() {
 				}
 			},
 			yaxis: {}
-		},
-		showSeries = settings.series || [],
-		skipSeries = settings.seriesSkip || [];
-	for (i in this.data) {
-		for (j in this.data[i]) {
-			if ( showSeries.length != 0 && showSeries.indexOf(j) == -1 ) {
-				continue;
-			}
-			if ( skipSeries.indexOf( j ) != -1 ) {
-				continue;
-			}
-			series.push(this.data[i][j]);
-		}
-	}
-//	console.log({series:series});
+		};
 	// set default options
 	setIf( options.xaxis, 'timeMode', 'local' );
 	// set customizable options
@@ -440,6 +456,7 @@ ChartWidget.prototype.render = function() {
 	setIf( options.yaxis, 'min',      settings.min );
 	setIf( options.yaxis, 'max',      settings.max );
 	setIf( options.lines, 'stacked',  settings.stacked );
+	setIf( options.lines, 'fill',     settings.fill );
 //	console.log('Flotr.draw',this.el[0],series,options);
 	var cp = this.el.css('position');
 	Flotr.draw(this.el[0],series,options);
@@ -461,6 +478,14 @@ Object.getFirstItem = function( o, cnt ) {
 	return o;
 };
 
+Object.values = function( o ) {
+	var keys = Object.keys(o), i, ret = [];
+	for (i=0;i<keys.length;i++) {
+		ret.push(o[keys[i]]);
+	}
+	return ret;
+};
+
 var NumberWidget = function(settings) {
 	BaseWidget.apply(this,arguments);
 };
@@ -469,15 +494,8 @@ util.inherits(NumberWidget,BaseWidget);
 NumberWidget.prototype.render = function() {
 	if ( !this.el ) return;
 	if ( !this.data ) return;
-	var series = {}, data, value;
-	for (src in this.data) {
-		data = this.data[src];
-		for (key in data) {
-			value = data[key][data[key].length-1];
-			series[key] = value;
-		}
-	}
-	console.log(this.data,series);
+	var series = this.getLastData()
+	console.log(this.data,list);
 	var table = $('<table class="numberTable"/>');
 	if (this.settings.horizontal) {
 		var tr = $('<tr/>');
@@ -511,14 +529,7 @@ util.inherits(SwitchWidget,BaseWidget);
 SwitchWidget.prototype.render = function() {
 	if ( !this.el ) return;
 	if ( !this.data ) return;
-	var series = {}, data, value;
-	for (src in this.data) {
-		data = this.data[src];
-		for (key in data) {
-			value = data[key][data[key].length-1];
-			series[key] = value;
-		}
-	}
+	var series = this.getLastData();
 	this.el.addClass('bulb-container');
 	var el, cnt = $('<div/>');
 	this.el.html('');

@@ -9,6 +9,10 @@ body, html,
 	background-color: #e7e2d6;
 }
 
+.dashboard-layout > div {
+	overflow: hidden;
+}
+
 table.numberTable {
 	margin: 3px;
 	border-width: 1px;
