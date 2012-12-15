@@ -392,6 +392,32 @@ BaseWidget.prototype.update = function( data ) {
 		this.render();
 	}
 };
+BaseWidget.prototype.applyAggregate = function( series ) {
+	if ( !this.settings.aggregate ) return series;
+	switch (this.settings.aggregate) {
+		case 'sum':
+			var agg = {}, i, j, list;
+			// sum values
+			for (i in series) {
+				list = series[i];
+				for (j=0;j<list.length;j++) {
+					agg[list[j][0]] !== undefined || (agg[list[j][0]] = 0);
+					agg[list[j][0]] += list[j][1];
+				}
+			}
+			// convert to list of points
+			list = [];
+			for (i in agg) {
+				list.push([i,agg[i]]);
+			}
+			list.sort(function(a,b){return a[0]-b[0];});
+			series = {
+				sum: list
+			};
+			break;
+	}
+	return series;
+};
 BaseWidget.prototype.getData = function() {
 	var settings = this.settings,
 		showSeries = settings.series || [],
@@ -408,6 +434,7 @@ BaseWidget.prototype.getData = function() {
 			series[j] = this.data[i][j];
 		}
 	}
+	series = this.applyAggregate(series);
 	return series;
 };
 BaseWidget.prototype.getLastData = function() {
@@ -468,14 +495,6 @@ function setIf( o, property, value ) {
 	if ( value !== undefined ) {
 		o[property] = value;
 	}
-};
-
-Object.getFirstItem = function( o, cnt ) {
-	cnt = cnt || 1;
-	while (cnt--) {
-		o = o[Object.keys(o)[0]];
-	}
-	return o;
 };
 
 Object.values = function( o ) {
