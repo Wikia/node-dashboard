@@ -9,6 +9,10 @@ var path = require('path')
 var app = express();
 var server = http.createServer(app);
 var io = require('socket.io').listen(server);
+io.enable('browser client minification');  // send minified client
+io.enable('browser client etag');          // apply etag caching logic based on version number
+io.enable('browser client gzip');          // gzip the file
+io.set('log level', 1);                    // no trash in logs
 
 var rootPath = process.cwd();
 var staticPath = path.join(rootPath, 'public');
@@ -19,7 +23,6 @@ app.configure(function () {
   app.use(express.favicon(path.join(staticPath, 'favicon.ico')));
   app.use(express.logger());
   app.use(express.bodyParser()); // json, urlencoded, multipart
-  //app.use(express.methodOverride());
 });
 var port = process.env.PORT || 8080;
 server.listen(port)
