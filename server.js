@@ -1,3 +1,4 @@
+#!/usr/bin/env node
 var path = require('path')
 	, util = require('util')
 	, express = require('express')
@@ -39,7 +40,6 @@ app.get('/providers', function(req, res) { // for testing
 });
 
 app.get('/sources', function(req, res) { // for testing
-  res.send()
   res.send(Object.keys(dataServer.sources).join('\n'), 200);
 });
 
